@@ -45,3 +45,19 @@ class ReadyCake(models.Model):
         verbose_name = "Готовый торт"
         verbose_name_plural = "Готовые торты"
 
+
+class CustomizedCake(models.Model):
+    levels = models.IntegerField(verbose_name="Количество уровней торта")
+    shape = models.CharField(max_length=20, verbose_name="Форма торта")
+    toping = models.CharField(max_length=30, verbose_name="Топпинг")
+    berries = models.CharField(max_length=20, blank=True, null=True,
+                               verbose_name="Ягоды")
+    decore = models.CharField(max_length=30, blank=True, null=True,
+                              verbose_name="Декор")
+    inscription = models.TextField(blank=True, null=True, verbose_name="Надпись на торте",
+                                   help_text="Мы можем разместить на торте любую надпись, например: «С днем рождения!»")
+    order = models.OneToOneField(to='cake_app.Order', on_delete=models.CASCADE, primary_key=True)
+
+    class Meta:
+        verbose_name = "Кастомизированный торт"
+        verbose_name_plural = "Кастомизированные торты"

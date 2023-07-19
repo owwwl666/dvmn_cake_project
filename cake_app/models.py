@@ -34,7 +34,7 @@ class Order(models.Model):
 class ReadyCake(models.Model):
     cake_name = models.CharField(max_length=200, verbose_name="Название торта")
     cake_price = models.IntegerField(verbose_name="Цена торта")
-    inscription = models.TextField(blank=True, null=True, verbose_name="Надпись на торте",
+    inscription = models.TextField(max_length=15, blank=True, null=True, verbose_name="Надпись на торте",
                                    help_text="Мы можем разместить на торте любую надпись, например: «С днем рождения!»")
     order = models.OneToOneField(to='cake_app.Order', on_delete=models.CASCADE, primary_key=True)
 
@@ -54,7 +54,7 @@ class CustomizedCake(models.Model):
                                verbose_name="Ягоды")
     decore = models.CharField(max_length=30, blank=True, null=True,
                               verbose_name="Декор")
-    inscription = models.TextField(blank=True, null=True, verbose_name="Надпись на торте",
+    inscription = models.TextField(max_length=15, blank=True, null=True, verbose_name="Надпись на торте",
                                    help_text="Мы можем разместить на торте любую надпись, например: «С днем рождения!»")
     order = models.OneToOneField(to='cake_app.Order', on_delete=models.CASCADE, primary_key=True)
 

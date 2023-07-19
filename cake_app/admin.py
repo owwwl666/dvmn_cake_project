@@ -1,3 +1,12 @@
 from django.contrib import admin
+from .models import Client, Order
 
-# Register your models here.
+
+@admin.register(Client)
+class ClientAdmin(admin.ModelAdmin):
+    list_display = ["client_tg_id", "client_tg_username"]
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ["client", "address", "delivery_date", "delivery_time", "promocode"]

@@ -24,8 +24,24 @@ class Order(models.Model):
     promocode = models.CharField(max_length=50, blank=True, null=True,
                                  verbose_name="Промокод")
     is_active = models.BooleanField(blank=True, null=True, verbose_name="Готов ли заказ")
-    comment = models.TimeField(blank=True, null=True, verbose_name="Комментарий к заказу")
+    comment = models.TextField(blank=True, null=True, verbose_name="Комментарий к заказу")
 
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
+
+
+class ReadyCake(models.Model):
+    cake_name = models.CharField(max_length=200, verbose_name="Название торта")
+    cake_price = models.IntegerField(verbose_name="Цена торта")
+    inscription = models.TextField(blank=True, null=True, verbose_name="Надпись на торте",
+                                   help_text="Мы можем разместить на торте любую надпись, например: «С днем рождения!»")
+    order = models.OneToOneField(to='cake_app.Order', on_delete=models.CASCADE, primary_key=True)
+
+    def __str__(self):
+        return self.cake_name
+
+    class Meta:
+        verbose_name = "Готовый торт"
+        verbose_name_plural = "Готовые торты"
+

@@ -9,4 +9,4 @@ class ClientAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["client", "address", "delivery_date", "delivery_time", "promocode"]
+    list_display = ["address", "delivery_date", "delivery_time", "is_active"]

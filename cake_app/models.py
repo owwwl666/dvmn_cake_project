@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Client(models.Model):
-    """"""
+    """Данные клиента (id и username в telegram)."""
     client_tg_id = models.IntegerField(verbose_name="ID пользователя")
     client_tg_username = models.CharField(max_length=200, verbose_name="Имя пользователя")
 
@@ -15,7 +15,7 @@ class Client(models.Model):
 
 
 class Order(models.Model):
-    """"""
+    """Информация о заказе."""
     client = models.ForeignKey(to='cake_app.Client', on_delete=models.CASCADE,
                                related_name="orders")
     address = models.TextField(verbose_name="Адресс заказа")
@@ -32,8 +32,10 @@ class Order(models.Model):
 
 
 class ReadyCake(models.Model):
+    """Описание торта, уже имеющегося в ассортименте."""
     cake_name = models.CharField(max_length=200, verbose_name="Название торта")
     cake_price = models.IntegerField(verbose_name="Цена торта")
+    # cake_image = models.ImageField()
     inscription = models.TextField(max_length=15, blank=True, null=True, verbose_name="Надпись на торте",
                                    help_text="Мы можем разместить на торте любую надпись, например: «С днем рождения!»")
     order = models.OneToOneField(to='cake_app.Order', on_delete=models.CASCADE, primary_key=True)
@@ -47,6 +49,7 @@ class ReadyCake(models.Model):
 
 
 class CustomizedCake(models.Model):
+    """Информация о торте, который клиент собрал самостоятельно."""
     levels = models.IntegerField(verbose_name="Количество уровней торта")
     shape = models.CharField(max_length=20, verbose_name="Форма торта")
     toping = models.CharField(max_length=30, verbose_name="Топпинг")

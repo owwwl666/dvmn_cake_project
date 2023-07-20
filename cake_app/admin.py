@@ -9,7 +9,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["address", "delivery_date", "delivery_time", "is_active"]
+    list_display = ["client", "address", "delivery_date", "delivery_time", "is_active"]
 
 
 @admin.register(ReadyCake)
@@ -19,4 +19,4 @@ class ReadyCake(admin.ModelAdmin):
 
 @admin.register(CustomizedCake)
 class CustomizedCakeAdmin(admin.ModelAdmin):
-    list_display = ["levels", "shape", "toping", "berries", "decore"]
+    list_display = ["levels", "shape", "toping", "filling", "berries", "decore"]

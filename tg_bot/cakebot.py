@@ -1,17 +1,21 @@
 import telebot
+import os
+
 from telebot import types
+from dvmn_cake_project.settings import STATIC_DIR, MEDIA_ROOT
 from datetime import datetime
-bot = telebot.TeleBot('6398010979:AAFxPibC3gWVnLSOT9eiujMk2SirpYRyAOo')
+bot = telebot.TeleBot('6230042552:AAHISknbBHIk3uni-Nd7Tx1ngzh0nzH2LpI')
 
 
 @bot.message_handler(commands = ['start'])
 def url(message):
-    doc = open('Согласие.doc', 'rb')
+    agreement_path = os.path.join(STATIC_DIR, 'Согласие.doc')
+    doc = open(agreement_path, 'rb')
     bot.send_document(message.from_user.id, doc)
     markup = types.InlineKeyboardMarkup()
     btn = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='✅')
     markup.add(btn)
-    bot.send_message(message.from_user.id, "Нажимая на кнопку ниже, Вы соглашаетесь с условиями Политики и даете согласие на обработку ваших персональных данных", reply_markup = markup)
+    bot.send_message(message.from_user.id, "Нажимая на кнопку ниже, Вы соглашаетесь с условиями Политики и даете согласие на обработку ваших персональных данных", reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Вернуться в главное меню ⬅️'))
@@ -66,17 +70,17 @@ def choose_cake(call):
     if call.data == 'Торт C (3000 р.)':
         order['price'] = 3000
     bot.send_message(call.from_user.id, 'Предлагаю ознакомиться с нашими тортами ')
-    bot.send_photo(call.from_user.id, photo=open('media/napoleon.jpg', 'rb'))
+    bot.send_photo(call.from_user.id, photo=open('../media/napoleon.jpg', 'rb'))
     bot.send_message(call.from_user.id, 'Наполеон. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/praga.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("../media/praga.jpg", 'rb'))
     bot.send_message(call.from_user.id, 'Прага. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/murav.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("../media/murav.jpg", 'rb'))
     bot.send_message(call.from_user.id, 'Муравейник. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/tiramisu.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("../media/tiramisu.jpg", 'rb'))
     bot.send_message(call.from_user.id, 'Торт Тирамису. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/medovik.png", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("../media/medovik.png", 'rb'))
     bot.send_message(call.from_user.id, 'Медовик. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/bisquit.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("../media/bisquit.jpg", 'rb'))
     bot.send_message(call.from_user.id, 'Бисквитный. Описание')
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data='Выбрать торт из предложенных', text='Выбрать торт из предложенных')
@@ -224,10 +228,7 @@ def default_cake(message):
     bot.send_message(message.from_user.id, f'Какой торт вы выбираете?', reply_markup=markup)
 
 
-
-
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith('Выбран торт '))  
+@bot.callback_query_handler(func=lambda call: call.data.startswith('Выбран торт'))
 def inscription_cake(message):
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data='Перейти к выбору доставки', text='Пропустить')
@@ -281,4 +282,10 @@ def address(message):
     markup.add(btn2)
     bot.send_message(message.from_user.id, 'Торт будет доставлен:', reply_markup=markup)
 
-bot.polling(none_stop=True, interval=0)
+
+def run_bot():
+    bot.polling(none_stop=True, interval=0)
+
+
+if __name__ == '__main__':
+    run_bot()

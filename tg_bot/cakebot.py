@@ -6,7 +6,7 @@ bot = telebot.TeleBot('6398010979:AAFxPibC3gWVnLSOT9eiujMk2SirpYRyAOo')
 
 @bot.message_handler(commands = ['start'])
 def url(message):
-    doc = open('Согласие.doc', 'rb')
+    doc = open('tg_bot/Согласие.doc', 'rb')
     bot.send_document(message.from_user.id, doc)
     markup = types.InlineKeyboardMarkup()
     btn = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='✅')
@@ -66,17 +66,17 @@ def choose_cake(call):
     if call.data == 'Торт C (3000 р.)':
         order['price'] = 3000
     bot.send_message(call.from_user.id, 'Предлагаю ознакомиться с нашими тортами ')
-    bot.send_photo(call.from_user.id, photo=open('media/napoleon.jpg', 'rb'))
+    bot.send_photo(call.from_user.id, photo=open('media/cake_image/napoleon.jpg', 'rb'))
     bot.send_message(call.from_user.id, 'Наполеон. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/praga.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("media/cake_image/praga.jpg", 'rb'))
     bot.send_message(call.from_user.id, 'Прага. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/murav.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("media/cake_image/murav.jpg", 'rb'))
     bot.send_message(call.from_user.id, 'Муравейник. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/tiramisu.jpg", 'rb'))
-    bot.send_message(call.from_user.id, 'Торт Тирамису. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/medovik.png", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("media/cake_image/tiramisu.jpg", 'rb'))
+    bot.send_message(call.from_user.id, 'Тирамису. Описание')
+    bot.send_photo(call.from_user.id, photo=open("media/cake_image/medovik.png", 'rb'))
     bot.send_message(call.from_user.id, 'Медовик. Описание')
-    bot.send_photo(call.from_user.id, photo=open("media/bisquit.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open("media/cake_image/bisquit.jpg", 'rb'))
     bot.send_message(call.from_user.id, 'Бисквитный. Описание')
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data='Выбрать торт из предложенных', text='Выбрать торт из предложенных')
@@ -208,23 +208,18 @@ def inscription_cake(message):
 '''     
 
 
-
-
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Выбрать торт из предложенных')) 
 def default_cake(message):
     markup = types.InlineKeyboardMarkup()
-    btn1 = types.InlineKeyboardButton(callback_data='Выбран торт', text='Наполеон')
-    btn2 = types.InlineKeyboardButton(callback_data='Выбран торт', text='Прага')
-    btn3 = types.InlineKeyboardButton(callback_data='Выбран торт', text='Муравейник')
-    btn4 = types.InlineKeyboardButton(callback_data='Выбран торт', text='Прага')
-    btn5 = types.InlineKeyboardButton(callback_data='Выбран торт', text='Прага')
-    btn6 = types.InlineKeyboardButton(callback_data='Выбран торт', text='Прага')
+    btn1 = types.InlineKeyboardButton(callback_data='Выбран торт Наполеон', text='Наполеон')
+    btn2 = types.InlineKeyboardButton(callback_data='Выбран торт Прага', text='Прага')
+    btn3 = types.InlineKeyboardButton(callback_data='Выбран торт Муравейник', text='Муравейник')
+    btn4 = types.InlineKeyboardButton(callback_data='Выбран торт Тирамису', text='Тирамису')
+    btn5 = types.InlineKeyboardButton(callback_data='Выбран торт Медовик', text='Медовик')
+    btn6 = types.InlineKeyboardButton(callback_data='Выбран торт Бисквитный', text='Бисквитный')
     btn7 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️')
     markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
     bot.send_message(message.from_user.id, f'Какой торт вы выбираете?', reply_markup=markup)
-
-
-
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Выбран торт '))  
@@ -235,7 +230,6 @@ def inscription_cake(message):
     #types.InlineKeyboard()
     markup.add(btn1, btn2)
     bot.send_message(message.from_user.id, 'Хотите сделать надпись на торте?   Мы можем разместить на торте любую надпись, например: «С днем рождения!» Введите текст надписи', reply_markup=markup)
-    print(types.InlineKeyboardMarkup())
 ''' проверка на пустую и слишком длинную надпись
     if message.data == '':
         bot.send_message(message.from_user.id, 'Вы ввели пустое сообщение, попробуйте ещё раз')

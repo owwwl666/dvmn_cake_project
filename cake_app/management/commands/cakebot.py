@@ -6,7 +6,6 @@ bot = telebot.TeleBot('6398010979:AAFxPibC3gWVnLSOT9eiujMk2SirpYRyAOo')
 
 
 class Command(BaseCommand):
-    # Используется как описание команды обычно
     help = 'Implemented to Django application telegram bot setup command'
 
     def handle(self, *args, **kwargs):

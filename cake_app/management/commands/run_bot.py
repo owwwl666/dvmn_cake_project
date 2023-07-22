@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from tg_bot.cakebot import run_bot
+from cake_app.cakebot import run_bot
 
 
 class Command(BaseCommand):

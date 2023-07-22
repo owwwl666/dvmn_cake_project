@@ -29,6 +29,9 @@ def url(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Вернуться в главное меню ⬅️'))
 def get_text_messages(message):
+    client, _ = Client.objects.get_or_create(client_tg_id=message.from_user.id,
+                                             client_tg_username=message.from_user.username)
+
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data='Заказать торт 🍰', text='Заказать торт 🍰')
     btn2 = types.InlineKeyboardButton(callback_data='Узнать сроки доставки 🕒', text='Узнать сроки доставки 🕒')

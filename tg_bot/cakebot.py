@@ -1,9 +1,13 @@
 import telebot
+import os
+
 from telebot import types
+
 from dotenv import load_dotenv
 import os
 import sqlite3
 from cake_app.models import Client, ReadyCake, Order, CustomizedCake
+from dvmn_cake_project.settings import STATIC_DIR, MEDIA_ROOT
 
 
 load_dotenv()
@@ -12,12 +16,13 @@ order = {}
 
 @bot.message_handler(commands = ['start'])
 def url(message):
-    doc = open('tg_bot/Согласие.doc', 'rb')
+    agreement_path = os.path.join(STATIC_DIR, 'Согласие.doc')
+    doc = open(agreement_path, 'rb')
     bot.send_document(message.from_user.id, doc)
     markup = types.InlineKeyboardMarkup()
     btn = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='✅')
     markup.add(btn)
-    bot.send_message(message.from_user.id, "Нажимая на кнопку ниже, Вы соглашаетесь с условиями Политики и даете согласие на обработку ваших персональных данных", reply_markup = markup)
+    bot.send_message(message.from_user.id, "Нажимая на кнопку ниже, Вы соглашаетесь с условиями Политики и даете согласие на обработку ваших персональных данных", reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Вернуться в главное меню ⬅️'))
@@ -306,4 +311,10 @@ def address(message):
 
     bot.send_message(message.from_user.id, f"Торт будет доставлен {order['delivery']} c 9:00 до 17:00.", reply_markup=markup)
 
-bot.polling(none_stop=True, interval=0)
+
+def run_bot():
+    bot.polling(none_stop=True, interval=0)
+
+
+if __name__ == '__main__':
+    run_bot()

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client, Order, ReadyCake, CustomizedCake
+from .models import Client, Order, ReadyCake, CustomizedCake, Baker
 
 
 @admin.register(Client)
@@ -20,3 +20,8 @@ class ReadyCake(admin.ModelAdmin):
 @admin.register(CustomizedCake)
 class CustomizedCakeAdmin(admin.ModelAdmin):
     list_display = ["levels", "shape", "toping", "filling", "berries", "decore"]
+
+
+@admin.register(Baker)
+class BakerAdmin(admin.ModelAdmin):
+    list_display = ["tg_id", "tg_username"]

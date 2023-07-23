@@ -119,3 +119,16 @@ class CustomizedCake(models.Model):
     class Meta:
         verbose_name = "Кастомизированный торт"
         verbose_name_plural = "Кастомизированные торты"
+
+
+class Baker(models.Model):
+    """Данные повара (id и username в telegram)."""
+    tg_id = models.IntegerField(verbose_name="ID пользователя")
+    tg_username = models.CharField(max_length=200, verbose_name="Имя пользователя")
+
+    def __str__(self):
+        return self.tg_username
+
+    class Meta:
+        verbose_name = "Кондитер"
+        verbose_name_plural = "Кондитеры"

@@ -83,6 +83,13 @@ class Order(models.Model):
     inscription = models.TextField(max_length=15, blank=True, null=True, verbose_name="Надпись на торте",
                                    help_text="Мы можем разместить на торте любую надпись, например: «С днем рождения!»")
 
+    def __str__(self):
+        if self.readycake:
+            cake = self.readycake
+        else:
+            cake = self.customizedcake
+        return f'''{cake}\nДата доставки: {self.delivery_date} c {self.delivery_time} до 17:00:00 часов.\n'''
+        
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
@@ -97,7 +104,7 @@ class ReadyCake(models.Model):
                                default="Без топпинга")
 
     def __str__(self):
-        return self.cake_name
+        return f'Торт {self.cake_name} за {self.cake_price} руб.'
 
     class Meta:
         verbose_name = "Готовый торт"
@@ -115,6 +122,9 @@ class CustomizedCake(models.Model):
                                verbose_name="Ягоды", choices=BERRIES, default="Без ягод")
     decore = models.CharField(max_length=50, blank=False,
                               verbose_name="Декор", choices=DECOR, default="Без декора")
+
+    def __str__(self):
+        return f'''Количество уровней торта: {self.levels}.\nФорма торта: {self.shape}.\nТоппинг: {self.filling}.\nЯгоды: {self.berries}.\nДекор:{self.decore}.'''
 
     class Meta:
         verbose_name = "Кастомизированный торт"

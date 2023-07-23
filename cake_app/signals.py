@@ -8,6 +8,5 @@ from cake_app.bakerbot import send_order
 @receiver(post_save, sender=Order)
 def send_orders(sender, instance, created, **kwargs):
     if created:
-        print(f'Handle signal')
         send_order(instance)
 

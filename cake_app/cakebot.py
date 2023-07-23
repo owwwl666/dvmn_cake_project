@@ -99,7 +99,7 @@ def custom_cake(call):
     order['customcake'] = True
     order['readycake'] = False
     markup = types.InlineKeyboardMarkup()
-    bot.send_photo(call.from_user.id, photo=open("media/уровни.jpg", 'rb'))
+    bot.send_photo(call.from_user.id, photo=open(os.path.join(MEDIA_ROOT, 'уровни.jpg'), 'rb'))
     btn1 = types.InlineKeyboardButton(callback_data=f'Форма 1 уровень', text='1 уровень (+400 р.)')
     btn2 = types.InlineKeyboardButton(callback_data=f'Форма 2 уровня', text='2 уровня (+750 р.)')
     btn3 = types.InlineKeyboardButton(callback_data=f'Форма 3 уровня', text='3 уровня (+1100 р.)')

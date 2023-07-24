@@ -1,13 +1,14 @@
 import telebot
 import os
+import datetime
+
 from telebot import types
 from dotenv import load_dotenv
-import os
 from cake_app.models import Client, ReadyCake, Order, CustomizedCake
 from datetime import datetime, time
-from pytz import timezone
 from dvmn_cake_project.settings import STATIC_DIR, MEDIA_ROOT
-import datetime
+
+
 load_dotenv()
 bot = telebot.TeleBot(os.environ["TG_TOKEN"])
 

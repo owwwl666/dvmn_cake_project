@@ -82,6 +82,7 @@ class Order(models.Model):
     comment = models.TextField(blank=True, null=True, verbose_name="Комментарий к заказу")
     inscription = models.TextField(max_length=15, blank=True, null=True, verbose_name="Надпись на торте",
                                    help_text="Мы можем разместить на торте любую надпись, например: «С днем рождения!»")
+    price = models.DecimalField(max_digits=7, decimal_places=2, verbose_name="Цена")
 
     def __str__(self):
         if self.readycake:

@@ -402,7 +402,8 @@ def details(message):
                              delivery_time=deliverytime,
                              address=order["address"],
                              comment=order["comment"],
-                             inscription=order["inscription"]
+                             inscription=order["inscription"],
+                             price=order['price']
                              )
     else:
         cake = CustomizedCake.objects.create(
@@ -418,7 +419,8 @@ def details(message):
                              delivery_time=deliverytime,
                              address=order["address"],
                              comment=order["comment"],
-                             inscription=order["inscription"]
+                             inscription=order["inscription"],
+                             price=order['price']
                              )
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data='Узнать дату доставки', text='Узнать дату доставки')

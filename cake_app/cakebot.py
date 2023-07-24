@@ -11,7 +11,7 @@ import datetime
 load_dotenv()
 bot = telebot.TeleBot(os.environ["TG_TOKEN"])
 
-order = {}
+order = {"inscription":"-","comment":"-",'delivery':"-"}
 deliverytime = time(9, 0, 0)
 
 
@@ -30,9 +30,11 @@ def url(message):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Вернуться в главное меню ⬅️'))
 def get_text_messages(message):
+    
     client, _ = Client.objects.get_or_create(client_tg_id=message.from_user.id,
                                              client_tg_username=message.from_user.username)
-    
+    global order
+    order = {"inscription":"-","comment":"-",'delivery':"-"}
     markup = types.InlineKeyboardMarkup()
     first = [types.InlineKeyboardButton(callback_data='Заказать торт 🍰', text='Заказать торт 🍰'), 
      types.InlineKeyboardButton(callback_data='Узнать сроки доставки 🕒', text='Узнать сроки доставки 🕒')
@@ -79,7 +81,7 @@ def find_out_delivery_time(call):
         bot.send_message(call.from_user.id, 'Центр - 12 часов\nВ пределах МКАДа - 1 день\nВ пределах области - 2 дня',
                          reply_markup=markup)
     elif call.data == 'Вернуться в главное меню ⬅️':
-        bot.edit_message_text(chat_id=call.chat.id, message_id=call.message_id, text='вы вернулись в главное меню',
+        bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message_id, text='вы вернулись в главное меню',
                               reply_markup=get_text_messages())
 
 
@@ -268,28 +270,26 @@ def inscription_cake(message):
         order['decore'] = 'Марципан'
         order['description'] = f"{order['description']} Кроме этого мы украсим Ваш торт марципаном."
     markup = types.InlineKeyboardMarkup()
+    btn0 = types.InlineKeyboardButton(callback_data='Сделать надпись', text='Сделать надпись')
     btn1 = types.InlineKeyboardButton(callback_data=f'Перейти к выбору доставки', text='Пропустить')
     btn2 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️')
-    markup.add(btn1, btn2)
+    markup.add(btn0, btn1, btn2)
     message = bot.send_message(message.from_user.id,
                                'Хотите сделать надпись на торте?   Мы можем разместить на торте любую надпись, например: «С днем рождения!» Введите текст надписи',
                                reply_markup=markup)
-    bot.register_next_step_handler(message, address)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Выбрать из тортов выше'))
-def default_cake(message):
+def default_cake(call):
     order['customcake'] = False
     order['readycake'] = True
-    markup = types.InlineKeyboardMarkup()
     readycakes = ReadyCake.objects.all()
     for readycake in readycakes.iterator():
-        markup.add(types.InlineKeyboardButton(callback_data=f'Выбран торт {readycake.cake_name}', text=readycake.cake_name))
-        bot.send_photo(message.from_user.id, photo=readycake.cake_image)
-        bot.send_message(message.from_user.id, f'{readycake.cake_name}\nЦена: {readycake.cake_price}р.')
-    btn7 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️')
-    markup.add(btn7)
-    bot.send_message(message.from_user.id, f'Какой торт вы выбираете?', reply_markup=markup)
+        bot.send_photo(call.from_user.id, photo=readycake.cake_image)
+        bot.send_message(call.from_user.id, f'{readycake.cake_name}\nЦена: {readycake.cake_price}р.')
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️'))
+    bot.send_message(call.from_user.id, f'Какой торт вы выбираете?', reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Выбран торт '))
@@ -301,32 +301,49 @@ def inscription_cake(message):
             order['price'] = readycake.cake_price
             order['description'] = readycake.cake_name
     markup = types.InlineKeyboardMarkup()
+    btn0 = types.InlineKeyboardButton(callback_data='Сделать надпись', text='Сделать надпись')
     btn1 = types.InlineKeyboardButton(callback_data='Перейти к выбору доставки', text='Пропустить')
     btn2 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️')
-    markup.add(btn1, btn2)
+    markup.add(btn0, btn1, btn2)
     bot.send_message(message.from_user.id,
                      'Хотите сделать надпись на торте?   Мы можем разместить на торте любую надпись, например: «С днем рождения!» Введите текст надписи',
                      reply_markup=markup)
+    
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('Сделать надпись'))
+def nadpis(call):
+    markup = types.ReplyKeyboardMarkup()
+    msg  = bot.send_message(call.from_user.id, "Введите текст надписи:", reply_markup=markup)
+    bot.register_next_step_handler(msg, nadpis2)
+    
+def nadpis2(call):
+    if len(call.text) > 4:
+        bot.send_message(call.from_user.id, "Надпись слишком длинная, попробуйте ещё раз!")
+        nadpis(call)
+    else:
+        order['inscription'] = call.text
+        bot.send_message(call.from_user.id, "Отлично! Надпись принята.")
+        bot.send_message(call.from_user.id, 'Перейдём к выбору доставки')
+        choose_delivery(call)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Перейти к выбору доставки'))
-def address(message):
-    if message.data == "Перейти к выбору доставки":
-        markup = types.InlineKeyboardMarkup()
-        btn1 = types.InlineKeyboardButton(callback_data=f'к комм в центре', text='Ваш адрес в центре города')
-        btn2 = types.InlineKeyboardButton(callback_data=f'к комм МКАДа', text='Ваш адрес в пределах МКАДа')
-        btn3 = types.InlineKeyboardButton(callback_data=f'к комм обл', text='В пределах области')
-        btn4 = types.InlineKeyboardButton(callback_data=f'к комм самовывоз', text='Самовывоз')
-        btn5 = types.InlineKeyboardButton(callback_data=f'Вернуться в главное меню ⬅️',
-                                          text='Вернуться в главное меню ⬅️')
-        markup.add(btn1, btn2, btn3, btn4, btn5)
-        bot.send_message(message.from_user.id,
-                         f'Введите адрес доставки\nСамовывоз возможен с завтрашнего дня с 9:00 до 17:00.',
-                         reply_markup=markup)
+def choose_delivery(message):
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton(callback_data=f'к комм в центре', text='Ваш адрес в центре города')
+    btn2 = types.InlineKeyboardButton(callback_data=f'к комм МКАДа', text='Ваш адрес в пределах МКАДа')
+    btn3 = types.InlineKeyboardButton(callback_data=f'к комм обл', text='В пределах области')
+    btn4 = types.InlineKeyboardButton(callback_data=f'дальше', text='Самовывоз')
+    btn5 = types.InlineKeyboardButton(callback_data=f'Вернуться в главное меню ⬅️',
+                                      text='Вернуться в главное меню ⬅️')
+    markup.add(btn1, btn2, btn3, btn4, btn5)
+    bot.send_message(message.from_user.id,
+                     f'Введите адрес доставки\nСамовывоз возможен с завтрашнего дня с 9:00 до 17:00.',
+                     reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('к комм'))
-def address(message):
+def get_address(message):
     global order
     if 'в центре' in message.data or 'МКАДа' in message.data:
         order['delivery'] = 'завтра'
@@ -334,52 +351,86 @@ def address(message):
     if 'обл' in message.data:
         order['delivery'] = 'послезавтра'
         order['delivery_time'] = datetime.datetime.today() +  datetime.timedelta(days=2)
-    if 'самовывоз' in message.data:
-        order['delivery'] = 'самовывоз'
-        order['delivery_time'] = datetime.datetime.today() +  datetime.timedelta(days=1)
     
+    if 'самовывоз' not in message.data:
+        markup = types.ReplyKeyboardMarkup()
+        msg  = bot.send_message(message.from_user.id, "Введите адрес:", reply_markup=markup)
+        bot.register_next_step_handler(msg, get_address2)
+    
+
+def get_address2(call):
+    order['address'] = call.text
+    bot.send_message(call.from_user.id, "Отлично! Адрес принят.")
+    bot.send_message(call.from_user.id, 'Осталось совсем немного!')
+    comment(call)
+        
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('дальше'))
+def comment(message):
+    if order['delivery'] != 'завтра' and order['delivery'] != 'послезавтра':
+        order['delivery'] = 'самовывоз'
+        order['address'] = 'самовывоз'
+        order['delivery_time'] = datetime.datetime.today() +  datetime.timedelta(days=1)
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data=f'Детали заказа', text='Пропустить')
-    btn2 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️')
-    markup.add(btn1, btn2)
+    btn2 = types.InlineKeyboardButton(callback_data=f'коммент', text='Добавить комментарий')
+    btn3 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню')
+    markup.add(btn2, btn1, btn3)
     bot.send_message(message.from_user.id, f'Вы можете добавить комментарий к заказу', reply_markup=markup)
 
 
+@bot.callback_query_handler(func=lambda call: call.data.startswith('коммент'))
+def get_comment(message):
+    markup = types.ReplyKeyboardMarkup()
+    msg  = bot.send_message(message.from_user.id, "Введите комментарий:", reply_markup=markup)
+    bot.register_next_step_handler(msg, get_comment2)
+def get_comment2(call):
+    order['comment'] = call.text
+    bot.send_message(call.from_user.id, "Отлично! Комментарий принят.")
+    details(call)
+
+
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Детали заказа'))
-def address(message):
+def details(message):
     client = Client.objects.get(client_tg_id=message.from_user.id)
     if order['readycake']:
         cake = ReadyCake.objects.get(cake_name=order['description'])
         Order.objects.create(client=client,
                              readycake=cake,
-                             address="Адрес",
                              delivery_date=order['delivery_time'],
                              delivery_time=deliverytime,
+                             address=order["address"],
+                             comment=order["comment"],
+                             inscription=order["inscription"]
                              )
     else:
         cake = CustomizedCake.objects.create(
                                  levels=order['levels'],
                                  shape=order['shape'],
                                  toping = order['topping'],
-                                 
+                                 berries = order['berries'],
+                                 decore = order["decore"]
                                  )
         Order.objects.create(client=client,
                              customizedcake=cake,
-                             address="Адрес",
                              delivery_date=order['delivery_time'],
                              delivery_time=deliverytime,
+                             address=order["address"],
+                             comment=order["comment"],
+                             inscription=order["inscription"]
                              )
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data='Узнать дату доставки', text='Узнать дату доставки')
     btn2 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️')
     markup.add(btn1, btn2)
     bot.send_message(message.from_user.id,
-                     f"Ваш заказ сохранён.\nДетали заказа: {order['description']}\nЦена: {order['price']} р.",
+                     f"Ваш заказ сохранён.\nДетали заказа: {order['description']}\nАдрес:  {order['address']}\nНадпись: {order['inscription']}\nКомментарий: {order['comment']}\nЦена: {order['price']} р.",
                      reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Узнать дату доставки'))
-def address(message):
+def check_com(message):
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️')
     markup.add(btn1)

@@ -283,11 +283,13 @@ def inscription_cake(message):
 def default_cake(call):
     order['customcake'] = False
     order['readycake'] = True
+    markup = types.InlineKeyboardMarkup()
     readycakes = ReadyCake.objects.all()
     for readycake in readycakes.iterator():
+        markup.add(types.InlineKeyboardButton(callback_data=f'Выбран торт {readycake.cake_name}',
+                                              text=readycake.cake_name))
         bot.send_photo(call.from_user.id, photo=readycake.cake_image)
         bot.send_message(call.from_user.id, f'{readycake.cake_name}\nЦена: {readycake.cake_price}р.')
-    markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton(callback_data='Вернуться в главное меню ⬅️', text='Вернуться в главное меню ⬅️'))
     bot.send_message(call.from_user.id, f'Какой торт вы выбираете?', reply_markup=markup)
 
@@ -313,11 +315,12 @@ def inscription_cake(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('Сделать надпись'))
 def nadpis(call):
     markup = types.ReplyKeyboardMarkup()
-    msg  = bot.send_message(call.from_user.id, "Введите текст надписи:", reply_markup=markup)
+    msg = bot.send_message(call.from_user.id, "Введите текст надписи:", reply_markup=markup)
     bot.register_next_step_handler(msg, nadpis2)
-    
+
+
 def nadpis2(call):
-    if len(call.text) > 4:
+    if len(call.text) > 15:
         bot.send_message(call.from_user.id, "Надпись слишком длинная, попробуйте ещё раз!")
         nadpis(call)
     else:
@@ -365,7 +368,6 @@ def get_address2(call):
     comment(call)
         
 
-
 @bot.callback_query_handler(func=lambda call: call.data.startswith('дальше'))
 def comment(message):
     if order['delivery'] != 'завтра' and order['delivery'] != 'послезавтра':
@@ -385,6 +387,8 @@ def get_comment(message):
     markup = types.ReplyKeyboardMarkup()
     msg  = bot.send_message(message.from_user.id, "Введите комментарий:", reply_markup=markup)
     bot.register_next_step_handler(msg, get_comment2)
+
+
 def get_comment2(call):
     order['comment'] = call.text
     bot.send_message(call.from_user.id, "Отлично! Комментарий принят.")
